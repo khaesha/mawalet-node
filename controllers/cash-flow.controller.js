@@ -2,6 +2,7 @@ const _ = require("lodash");
 const { validationResult } = require("express-validator/check");
 
 const CashFlow = require("../models/cash-flow.model");
+const User = require("../models/user.model");
 
 exports.getAll = (req, res, next) => {
   const page = req.query.page ? req.query.page : 1;
@@ -39,15 +40,32 @@ exports.create = (req, res, next) => {
     throw error;
   }
 
-  const body = _.pick(req.body, ["type", "category", "amount", "description"]);
+  const body = _.pick(req.body, [
+    "is_expense",
+    "category",
+    "amount",
+    "description"
+  ]);
   const post = new CashFlow({ ...body, user: req.user._id });
   post
     .save()
     .then(result => {
+      // update balance on user
+      return User.update(
+        { _id: req.user._id },
+        { $inc: { balance: result.amount } }
+      );
+
+      // res.status(201).json({
+      //   err_no: 0,
+      //   message: "Cash flow created successfully",
+      //   data: { id: result._id }
+      // });
+    })
+    .then(result => {
       res.status(201).json({
         err_no: 0,
-        message: "Cash flow created successfully",
-        data: { id: result._id }
+        message: "Cash flow created successfully"
       });
     })
     .catch(err => {
