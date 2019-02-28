@@ -1,5 +1,5 @@
 // environment variable
-process.env.NODE_ENV = "test";
+process.env.NODE_ENV = "development";
 
 // uncomment below line to test this code against staging environment
 // process.env.NODE_ENV = 'staging';
@@ -7,11 +7,14 @@ process.env.NODE_ENV = "test";
 const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const bluebird = require("bluebird");
 
 const config = require("./config/config");
 
 const authRoutes = require("./routes/auth.route");
 const cashFlowRoutes = require("./routes/cash-flow.route");
+const categoryRoutes = require("./routes/category.route");
+const summaryRouters = require("./routes/summary.route");
 
 const app = express();
 
@@ -35,6 +38,8 @@ app.get("/", (req, res) => {
 
 app.use("/auth", authRoutes);
 app.use("/cash-flow", cashFlowRoutes);
+app.use("/category", categoryRoutes);
+app.use("/summary", summaryRouters);
 
 app.use((error, req, res, next) => {
   const status = error.statusCode || 500;
@@ -43,6 +48,8 @@ app.use((error, req, res, next) => {
   res.status(status).json({ message, data });
 });
 
+mongoose.Promise = bluebird;
+mongoose.set("debug", global.gConfig.db_debug);
 mongoose
   .connect(
     `${global.gConfig.db_engine}://${global.gConfig.db_uri}:${
