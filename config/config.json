@@ -6,7 +6,8 @@
     "db_engine": "mongodb",
     "db_port": 27017,
     "db_uri": "localhost",
-    "db_name": "mawalet-dev"
+    "db_name": "mawalet-dev",
+    "db_debug": true
   },
   "test": {
     "config_id": "test",
@@ -15,11 +16,13 @@
   "staging": {
     "config_id": "staging",
     "node_port": 8080,
-    "db_name": "mawalet"
+    "db_name": "mawalet",
+    "db_debug": false
   },
   "production": {
     "config_id": "production",
     "node_port": 8080,
-    "db_name": "mawalet"
+    "db_name": "mawalet",
+    "db_debug": false
   }
 }
