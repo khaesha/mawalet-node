@@ -5,6 +5,8 @@ const jwt = require("jsonwebtoken");
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
+  password: { type: String, required: true },
+  balance: { type: Number, default: 0 },
   status: { type: String, default: "active" },
   tokens: [
     {

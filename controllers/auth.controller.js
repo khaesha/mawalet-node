@@ -1,5 +1,6 @@
-const _ = require('lodash');
+const _ = require("lodash");
 const { validationResult } = require("express-validator/check");
+const bcrypt = require("bcryptjs");
 
 const User = require("../models/user.model");
 
@@ -11,19 +12,29 @@ exports.getToken = (req, res, next) => {
     throw error;
   }
 
-  const body = _.pick(req.body, ['email']);
+  const body = _.pick(req.body, ["email", "password"]);
+  let loadedUser;
 
-  User.findOne(body)
+  User.findOne({ email: body.email })
     .then(user => {
       if (!user) {
         const error = new Error("A user with this email could not be found.");
         error.statusCode = 404;
         throw error;
       }
+      loadedUser = user;
+      return bcrypt.compare(body.password, user.password);
+    })
+    .then(isEqual => {
+      if (!isEqual) {
+        const error = new Error("Wrong password");
+        error.statusCode = 401;
+        throw error;
+      }
       const data = {
-        _id: user._id,
-        name: user.name,
-        token: user.tokens[0].token
+        name: loadedUser.name,
+        email: loadedUser.email,
+        token: loadedUser.tokens[0].token
       };
       res.status(200).json({ err_no: 0, message: "Success", data });
     })
@@ -43,12 +54,18 @@ exports.register = (req, res, next) => {
     throw error;
   }
 
-  const body = _.pick(req.body, ['email', 'name']);
-
-  const user = new User(body);
-  user
-    .save()
-    .then(() => {
+  const body = _.pick(req.body, ["email", "name", "password"]);
+  const user = new User();
+  bcrypt
+    .hash(body.password, 12)
+    .then(hashedPassword => {
+      user.email = body.email;
+      user.name = body.name;
+      user.password = hashedPassword;
+      return user.save();
+    })
+    .then(result => {
+      console.log("[authController][register] result", result);
       return user.generateAuthToken();
     })
     .then(token => {
