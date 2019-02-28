@@ -17,7 +17,7 @@ exports.getToken = (req, res, next) => {
 
   User.findOne({ email: body.email })
     .then(user => {
-      if (!user) {
+      if (_.isEmpty(user)) {
         const error = new Error("A user with this email could not be found.");
         error.statusCode = 404;
         throw error;
@@ -65,7 +65,6 @@ exports.register = (req, res, next) => {
       return user.save();
     })
     .then(result => {
-      console.log("[authController][register] result", result);
       return user.generateAuthToken();
     })
     .then(token => {

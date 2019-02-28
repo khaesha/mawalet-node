@@ -1,3 +1,6 @@
+const _ = require('lodash');
+const { validationResult } = require('express-validator/check')
+
 const CashFlow = require("../models/cash-flow.model");
 const User = require("../models/user.model");
 
@@ -19,7 +22,14 @@ exports.getBalance = (req, res, next) => {
 };
 
 exports.report = (req, res, next) => {
-  console.log("[report] query", req.query);
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    const error = new Error("Validation failed, entered data is incorrect");
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const endDate = req.query.end_date || new Date();
 
   CashFlow.aggregate([
     {
@@ -27,7 +37,7 @@ exports.report = (req, res, next) => {
         user: req.user._id,
         date: {
           $gte: new Date(req.query.start_date),
-          $lte: new Date(req.query.end_date)
+          $lte: new Date(endDate)
         }
       }
     },
@@ -55,6 +65,12 @@ exports.report = (req, res, next) => {
     }
   ])
     .then(result => {
+      if (_.isEmpty(result)) {
+        const error = new Error("Could not find data");
+        error.statusCode = 404;
+        throw error;
+      }
+
       res.status(200).json({
         err_no: 0,
         message: "Fetch report success",

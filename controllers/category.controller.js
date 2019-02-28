@@ -1,4 +1,5 @@
 const { validationResult } = require("express-validator/check");
+const _ = require('lodash');
 
 const Category = require("../models/category.model");
 
@@ -31,6 +32,11 @@ exports.getById = (req, res, next) => {
 
   Category.findById(id)
     .then(result => {
+      if (_.isEmpty(result)) {
+        const error = new Error("Could not find data");
+        error.statusCode = 404;
+        throw error;
+      }
       res.status(200).json({
         err_no: 0,
         message: "Fetch category success",
@@ -50,11 +56,12 @@ exports.delete = (req, res, next) => {
 
   Category.findByIdAndRemove(id)
     .then(result => {
-      if (!result) {
+      if (_.isEmpty(result)) {
         const error = new Error("Could not find data");
         error.statusCode = 404;
         throw error;
       }
+
       res.status(200).json({
         err_no: 0,
         message: "Delete data success"

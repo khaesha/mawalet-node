@@ -10,10 +10,6 @@ exports.getAll = (req, res, next) => {
 
   const options = { page, limit, populate: { path: "user", select: "name" } };
 
-  //   CashFlow.find({
-  //     user: req.user._id
-  //   })
-  //     .populate("user", "name")
   CashFlow.paginate({ user: req.user._id }, options)
     .then(result => {
       res.status(200).json({
@@ -55,12 +51,6 @@ exports.create = (req, res, next) => {
         { _id: req.user._id },
         { $inc: { balance: result.amount } }
       );
-
-      // res.status(201).json({
-      //   err_no: 0,
-      //   message: "Cash flow created successfully",
-      //   data: { id: result._id }
-      // });
     })
     .then(result => {
       res.status(201).json({
@@ -82,6 +72,12 @@ exports.getById = (req, res, next) => {
   CashFlow.findById(id)
     .populate("user", "name")
     .then(result => {
+      if (_.isEmpty(result)) {
+        const error = new Error("Could not find data");
+        error.statusCode = 404;
+        throw error;
+      }
+
       res.status(200).json({
         err_no: 0,
         message: "Fetch data success",
@@ -101,11 +97,12 @@ exports.delete = (req, res, next) => {
 
   CashFlow.findByIdAndRemove(id)
     .then(result => {
-      if (!result) {
+      if (_.isEmpty(result)) {
         const error = new Error("Could not find data");
         error.statusCode = 404;
         throw error;
       }
+
       res.status(200).json({
         err_no: 0,
         message: "Delete data success"
