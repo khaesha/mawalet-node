@@ -6,20 +6,20 @@ const router = express.Router();
 const authController = require("../controllers/auth.controller");
 const User = require("../models/user.model");
 
-router.post(
-  "/getToken",
-  [
-    body("email")
-      .trim()
-      .isEmail()
-      .withMessage("Invalid email format"),
-    body("password")
-      .trim()
-      .isLength({ min: 5 })
-      .withMessage("Must be at least 5 chars long")
-  ],
-  authController.getToken
-);
+// router.post(
+//   "/getToken",
+//   [
+//     body("email")
+//       .trim()
+//       .isEmail()
+//       .withMessage("Invalid email format"),
+//     body("password")
+//       .trim()
+//       .isLength({ min: 5 })
+//       .withMessage("Must be at least 5 chars long")
+//   ],
+//   authController.getToken
+// );
 router.post(
   "/register",
   [
@@ -52,5 +52,6 @@ router.post(
   ],
   authController.register
 );
+router.post("/login", authController.login);
 
 module.exports = router;

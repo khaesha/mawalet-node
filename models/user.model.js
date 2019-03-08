@@ -2,18 +2,21 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 const jwt = require("jsonwebtoken");
 
+const tokenSchema = new Schema(
+  {
+    access: { type: String, required: true },
+    token: { type: String, required: true }
+  },
+  { _id: false }
+);
+
 const userSchema = new Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
-  password: { type: String, required: true },
+  password: { type: String },
   balance: { type: Number, default: 0 },
   status: { type: String, default: "active" },
-  tokens: [
-    {
-      access: { type: String, required: true },
-      token: { type: String, required: true }
-    }
-  ]
+  tokens: [tokenSchema]
 });
 
 userSchema.methods.generateAuthToken = function() {
