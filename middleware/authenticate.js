@@ -20,6 +20,7 @@ const authenticate = (req, res, next) => {
     })
     .catch(err => {
       console.log('[authenticate][findByToken] err', err)
+      next(err);
     });
 };
 
