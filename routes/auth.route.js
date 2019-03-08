@@ -52,6 +52,28 @@ router.post(
   ],
   authController.register
 );
-router.post("/login", authController.login);
+router.post(
+  "/login",
+  [
+    body("email")
+      .trim()
+      .isEmail()
+      .withMessage("Invalid email format"),
+    body("password")
+      .trim()
+      .custom((value, { req }) => {
+        // Check if login type is undefined (normal login method)
+        if (typeof req.body.login_type === undefined) {
+          if (value === "") {
+            throw new Error("Incorrect email or password");
+          }
+          if (value.length < 5) {
+            throw new Error("Must be at least 5 chars long");
+          }
+        }
+      })
+  ],
+  authController.login
+);
 
 module.exports = router;
