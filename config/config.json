@@ -2,7 +2,7 @@
   "development": {
     "config_id": "development",
     "app_name": "Mawalet",
-    "node_port": 3000,
+    "node_port": 3030,
     "db_engine": "mongodb",
     "db_port": 27017,
     "db_uri": "localhost",
