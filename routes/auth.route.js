@@ -63,13 +63,21 @@ router.post(
       .trim()
       .custom((value, { req }) => {
         // Check if login type is undefined (normal login method)
-        if (typeof req.body.login_type === undefined) {
-          if (value === "") {
+        if (
+          typeof req.body.login_type === "undefined" &&
+          req.body.login_type === "" &&
+          req.body.login_type === null
+        ) {
+          if (value === "" && typeof value === "undefined" && value === null) {
             throw new Error("Incorrect email or password");
           }
           if (value.length < 5) {
             throw new Error("Must be at least 5 chars long");
           }
+          return value;
+        } else {
+          console.log("validasi login 2");
+          return value;
         }
       })
   ],

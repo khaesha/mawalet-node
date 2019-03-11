@@ -91,16 +91,12 @@ exports.login = (req, res, next) => {
   const loginType = req.body.login_type;
 
   switch (loginType) {
-    case "normal":
+    default:
       normalLogin(req, res, next);
       break;
     case "google":
       googleLogin(req, res, next);
       break;
-    default:
-      const error = new Error("Invalid access");
-      error.statusCode = 500;
-      throw error;
   }
 };
 
